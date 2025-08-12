@@ -1,0 +1,50 @@
+import { FILTER_OPTIONS } from "../../../utils/constants";
+
+const AgeFilter = ({ selectedRatings, onChange }) => {
+  const handleRatingToggle = (rating) => {
+    const newSelectedRatings = selectedRatings.includes(rating)
+      ? selectedRatings.filter((r) => r !== rating)
+      : [...selectedRatings, rating];
+    onChange(newSelectedRatings);
+  };
+
+  const handleSelectAll = () => {
+    onChange([]);
+  };
+
+  return (
+    <div className="space-y-3">
+      <h3 className="text-white font-medium text-sm mb-3">Độ tuổi:</h3>
+      <div className="flex flex-wrap gap-2">
+        {/* Tất cả button */}
+        <button
+          onClick={handleSelectAll}
+          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 ${
+            selectedRatings.length === 0
+              ? "bg-yellow-500 text-black"
+              : "bg-gray-700 text-white hover:bg-gray-600"
+          }`}
+        >
+          Tất cả
+        </button>
+
+        {/* Rating buttons */}
+        {FILTER_OPTIONS.AGE_RATINGS.map((rating) => (
+          <button
+            key={rating.value}
+            onClick={() => handleRatingToggle(rating.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors duration-200 ${
+              selectedRatings.includes(rating.value)
+                ? "bg-yellow-500 text-black"
+                : "bg-gray-700 text-white hover:bg-gray-600"
+            }`}
+          >
+            {rating.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default AgeFilter;
