@@ -1,0 +1,223 @@
+import { useState, useRef, useEffect } from "react";
+import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Virtual } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import ItemCard from "./ItemCard";
+import { MovieCardSkeleton } from "./Skeleton";
+import useSlider from "../hooks/useSlider";
+
+const VISIBLE_COUNT = 7;
+
+const SliderMovie = ({
+  title,
+  endpoint,
+  mediaType,
+  showViewMore = true,
+  limit = 15,
+}) => {
+  const {
+    data,
+    loading,
+    error,
+    retry,
+    getCachedPreviewData,
+    cachePreviewData,
+  } = useSlider(endpoint, mediaType, limit);
+
+  const [swiperInstance, setSwiperInstance] = useState(null);
+  const prevRef = useRef(null);
+  const nextRef = useRef(null);
+  const [slideProgress, setSlideProgress] = useState({});
+
+  const breakpoints = {
+    0: { slidesPerView: 1, spaceBetween: 10 },
+    640: { slidesPerView: 2, spaceBetween: 15 },
+    768: { slidesPerView: 4, spaceBetween: 20 },
+    1024: { slidesPerView: 5, spaceBetween: 20 },
+    1280: { slidesPerView: 6, spaceBetween: 25 },
+    1536: { slidesPerView: 7, spaceBetween: 25 },
+  };
+
+  useEffect(() => {
+    if (swiperInstance && prevRef.current && nextRef.current) {
+      swiperInstance.params.navigation.prevEl = prevRef.current;
+      swiperInstance.params.navigation.nextEl = nextRef.current;
+      swiperInstance.navigation.init();
+      swiperInstance.navigation.update();
+    }
+  }, [swiperInstance]);
+
+  // Xử lý slide progress để tạo hiệu ứng fade
+  const handleSlideProgress = (swiper) => {
+    const progressData = {};
+    swiper.slides.forEach((slide, index) => {
+      const slideEl = slide;
+      const slideProgress = slideEl.progress;
+
+      // Tính toán opacity dựa trên vị trí slide
+      let opacity = 1;
+      let scale = 1;
+
+      if (slideProgress < -0.8 || slideProgress > 0.8) {
+        // Slide đang ở ngoài viewport
+        opacity = 0.3;
+        scale = 0.8;
+      } else if (slideProgress < -0.5 || slideProgress > 0.5) {
+        // Slide đang di chuyển ra ngoài
+        const factor = Math.abs(slideProgress);
+        opacity = 1 - (factor - 0.5) * 2;
+        scale = 1 - (factor - 0.5) * 0.4;
+      }
+
+      progressData[index] = { opacity, scale };
+    });
+
+    setSlideProgress(progressData);
+  };
+
+  if (error) {
+    return (
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
+        </div>
+        <div className="bg-red-900/20 border border-red-500 rounded-lg p-4">
+          <p className="text-red-400 mb-2">Không thể tải dữ liệu</p>
+          <button
+            onClick={retry}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition-colors"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleViewMore = () => console.log(`View more for: ${title}`);
+
+  return (
+    <div className="mb-8">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-white">{title}</h2>
+        {showViewMore && (
+          <button
+            onClick={handleViewMore}
+            className="text-yellow-400 hover:text-yellow-300 font-medium transition-colors flex items-center space-x-1"
+          >
+            <span>Xem thêm</span>
+            <FaAngleRight className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Slider Container */}
+      <div className="relative group px-2 overflow-hidden">
+        {loading ? (
+          <div className="flex space-x-4">
+            {[...Array(VISIBLE_COUNT)].map((_, index) => (
+              <div key={index} className="flex-shrink-0">
+                <MovieCardSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <>
+            {/* Navigation Buttons */}
+            <button
+              ref={prevRef}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 disabled:opacity-30"
+              aria-label="Previous"
+            >
+              <FaAngleLeft className="w-6 h-6" />
+            </button>
+
+            <button
+              ref={nextRef}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-black/70 hover:bg-black/90 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 disabled:opacity-30"
+              aria-label="Next"
+            >
+              <FaAngleRight className="w-6 h-6" />
+            </button>
+
+            {/* Gradient Overlays cho hiệu ứng fade */}
+            <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-gray-900 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-gray-900 to-transparent z-10 pointer-events-none"></div>
+
+            {/* Swiper */}
+            <Swiper
+              modules={[Navigation, Virtual]}
+              breakpoints={breakpoints}
+              navigation={{ prevEl: prevRef.current, nextEl: nextRef.current }}
+              virtual
+              slidesPerView={VISIBLE_COUNT}
+              spaceBetween={25}
+              onSwiper={setSwiperInstance}
+              watchSlidesProgress
+              onProgress={handleSlideProgress}
+              slideVisibleClass="slide-visible"
+              className="movie-slider"
+              style={{ overflow: "visible" }}
+            >
+              {data.map((item, index) => {
+                const progress = slideProgress[index] || {
+                  opacity: 1,
+                  scale: 1,
+                };
+
+                return (
+                  <SwiperSlide
+                    key={`${item.id}-${index}`}
+                    virtualIndex={index}
+                    className="h-auto flex justify-center items-start"
+                    style={{
+                      transform: `scale(${progress.scale})`,
+                      opacity: progress.opacity,
+                      transition: "opacity 0.3s ease, transform 0.3s ease",
+                    }}
+                  >
+                    <ItemCard
+                      item={item}
+                      mediaType={mediaType}
+                      getCachedPreviewData={getCachedPreviewData}
+                      cachePreviewData={cachePreviewData}
+                    />
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+          </>
+        )}
+      </div>
+
+      <style jsx>{`
+        .movie-slider .swiper-slide {
+          transition: opacity 0.3s ease, transform 0.3s ease !important;
+        }
+
+        .movie-slider .swiper-slide-active {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .movie-slider .swiper-slide-next,
+        .movie-slider .swiper-slide-prev {
+          opacity: 0.8;
+          transform: scale(0.95);
+        }
+
+        .movie-slider .swiper-slide-duplicate-active,
+        .movie-slider .swiper-slide-duplicate-next,
+        .movie-slider .swiper-slide-duplicate-prev {
+          opacity: 0.6;
+          transform: scale(0.9);
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default SliderMovie;

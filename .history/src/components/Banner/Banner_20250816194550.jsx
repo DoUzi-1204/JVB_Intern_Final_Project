@@ -1,0 +1,133 @@
+import useBanner from "../../hooks/useBanner";
+import InforFilm from "./InforFilm";
+import PosterFilm from "./PosterFilm";
+
+const Banner = () => {
+  const {
+    movies,
+    currentMovie,
+    setCurrentMovie,
+    movieDetails,
+    movieDetailsEn,
+    movieImages,
+    loading,
+    error,
+    IMAGE_BASE_URL,
+  } = useBanner();
+
+  const getMovieLogo = () => {
+    const currentImages = movieImages[currentMovie?.id];
+    if (!currentImages?.logos) return null;
+
+    let logo = currentImages.logos.find((logo) => logo.iso_639_1 === "vi");
+    if (!logo)
+      logo = currentImages.logos.find((logo) => logo.iso_639_1 === "en");
+    if (!logo && currentImages.logos.length > 0) logo = currentImages.logos[0];
+
+    return logo ? `${IMAGE_BASE_URL}/w500${logo.file_path}` : null;
+  };
+
+  const getCertification = () => {
+    const currentDetails = movieDetails[currentMovie?.id];
+    if (!currentDetails?.release_dates?.results) return "NR";
+
+    const usRelease = currentDetails.release_dates.results.find(
+      (release) => release.iso_3166_1 === "US"
+    );
+    return usRelease?.release_dates?.[0]?.certification || "NR";
+  };
+
+  const formatRuntime = (minutes) => {
+    if (!minutes) return "";
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins === 0 ? `${hours}h` : `${hours}h ${mins}m`;
+  };
+
+  const formatReleaseYear = (dateString) => {
+    return dateString ? new Date(dateString).getFullYear() : "";
+  };
+
+  if (error)
+    return (
+      <div className="h-screen flex items-center justify-center text-white">
+        Error: {error}
+      </div>
+    );
+  if (loading || !currentMovie)
+    return (
+      <div className="h-screen flex items-center justify-center text-white">
+        Loading...
+      </div>
+    );
+
+  const backdropUrl = currentMovie?.backdrop_path
+    ? `${IMAGE_BASE_URL}/original${currentMovie.backdrop_path}`
+    : "";
+
+  return (
+<div className="relative h-screen w-full overflow-hidden">
+  {/* Background */}
+  <div
+    className="
+      absolute inset-0 bg-center bg-no-repeat
+      transform scale-95 sm:scale-100 md:scale-105 lg:scale-110
+      transition-transform duration-300
+    "
+    style={{ backgroundImage: `url(${backdropUrl})`, backgroundSize: "cover" }}
+  >
+    {/* Dot Pattern Overlay */}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        backgroundImage: `radial-gradient(#000 0.05px, transparent 1px)`,
+        backgroundSize: "2px 2px",
+        zIndex: 1,
+      }}
+    ></div>
+
+    {/* Vignette bốn phía */}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        background: `
+          linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 20%),
+          linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, transparent 20%),
+          linear-gradient(to right, rgba(0,0,0,0.6) 0%, transparent 20%),
+          linear-gradient(to left, rgba(0,0,0,0.6) 0%, transparent 20%)
+        `,
+        zIndex: 2,
+      }}
+    ></div>
+
+    {/* Soft edge blur bottom */}
+    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/70 via-black/60 to-transparent z-[3]"></div>
+  </div>
+</div>
+
+
+      {/* Content */}
+      <div className="relative z-10 h-full flex items-center">
+        <div className="container mx-auto px-6 flex items-center justify-between h-full">
+          <InforFilm
+            currentMovie={currentMovie}
+            currentDetails={movieDetails[currentMovie.id]}
+            currentDetailsEn={movieDetailsEn[currentMovie.id]}
+            getMovieLogo={getMovieLogo}
+            getCertification={getCertification}
+            formatRuntime={formatRuntime}
+            formatReleaseYear={formatReleaseYear}
+          />
+          <PosterFilm
+            movies={movies}
+            currentMovie={currentMovie}
+            setCurrentMovie={setCurrentMovie}
+            IMAGE_BASE_URL={IMAGE_BASE_URL}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Banner;

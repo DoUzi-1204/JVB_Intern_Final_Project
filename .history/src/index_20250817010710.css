@@ -1,0 +1,16 @@
+/* Trong file global Tailwind, ví dụ globals.css hoặc index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  /* Slide mặc định (ngoài viewport) */
+  .movie-slider .swiper-slide {
+    @apply opacity-0 scale-95 transition-all duration-300;
+  }
+
+  /* Slide đang visible */
+  .movie-slider .swiper-slide.slide-visible {
+    @apply opacity-100 scale-100;
+  }
+}
