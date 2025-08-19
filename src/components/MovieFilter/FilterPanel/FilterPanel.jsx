@@ -40,7 +40,7 @@ const FilterPanel = ({
 
       {/* Filter Content */}
       {isExpanded && (
-        <div className="p-3 space-y-3 border border-gray-700 rounded-lg mt-2">
+        <div className="px-3 py-3 space-y-3 border border-gray-700 rounded-lg mt-2">
           {/* Type Filter */}
           <div className="border-b border-gray-700 pb-3">
             <TypeFilter

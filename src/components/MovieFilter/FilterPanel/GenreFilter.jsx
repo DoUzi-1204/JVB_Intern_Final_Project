@@ -63,7 +63,7 @@ const GenreFilter = ({ selectedGenres, onChange }) => {
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-400"></div>
         </div>
       ) : (
-        <div className="flex items-start gap-4 max-h-48 overflow-y-auto px-9">
+        <div className="flex items-start gap-4 px-0 md:px-9">
           <h3 className="text-white font-medium text-sm w-24 text-right flex-shrink-0">
             Thể loại:
           </h3>

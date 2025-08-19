@@ -75,13 +75,13 @@ const TvPreview = ({ data, getCertification, formatReleaseYear }) => {
             className="border border-white/50 bg-gray-600/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center space-x-1 hover:text-yellow-300 transition-colors"
             title="Chi tiết"
           >
-            <FaCircleInfo className="w-4 h-4 transition-colors flex-shrink-0" />
+            <FaCircleInfo className="w-5 h-5 transition-colors flex-shrink-0" />
             <span className="leading-none">Chi tiết</span>
           </Link>
 
           {/* Yêu thích - Giữ nguyên button */}
           <button
-            className="border border-white/50 bg-gray-600/50 backdrop-blur-sm text-white p-2.5 rounded-full transition-colors hover:text-yellow-300"
+            className="border border-white/50 bg-gray-600/50 backdrop-blur-sm text-white p-3 rounded-full transition-colors hover:text-yellow-300"
             title="Yêu thích"
           >
             <FaHeart className="w-3 h-3 transition-colors" />

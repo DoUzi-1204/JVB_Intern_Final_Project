@@ -7,7 +7,7 @@ const SortOptions = ({ value, onChange }) => {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-start gap-4 px-9">
+      <div className="flex items-start gap-4 px-0 md:px-9">
         <h3 className="text-white font-medium text-sm w-24 text-right flex-shrink-0">
           Sắp xếp:
         </h3>

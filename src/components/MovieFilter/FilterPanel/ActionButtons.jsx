@@ -3,7 +3,7 @@ import { IoClose } from "react-icons/io5";
 
 const ActionButtons = ({ onApplyFilters, onClearFilters, onClose }) => {
   return (
-    <div className="pt-1 pl-36">
+    <div className="pt-1 pl-0">
       <div className="flex gap-3 justify-between">
         <div className="flex gap-3">
           {/* Nút lọc kết quả */}
