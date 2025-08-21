@@ -1,8 +1,8 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiSearch, FiX } from "react-icons/fi";
-import { API_CONFIG } from "../utils/constants";
-import useSearch from "../hooks/useSearch";
+import { API_CONFIG } from "../../utils/constants";
+import useSearch from "../../hooks/useSearch";
 
 const AutoComplete = ({ className = "" }) => {
   const navigate = useNavigate();
