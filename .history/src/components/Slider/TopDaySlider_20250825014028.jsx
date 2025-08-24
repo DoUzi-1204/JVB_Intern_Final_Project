@@ -34,10 +34,7 @@ const TopDaySlider = ({ title = "Top 10 phim lẻ hôm nay", limit = 10 }) => {
 
       try {
         // fetch English titles via server proxy
-        const PROXY_BASE =
-          API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http")
-            ? `${API_CONFIG.BASE_URL}/api`
-            : "/api";
+  const PROXY_BASE = API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http") ? `${API_CONFIG.BASE_URL}/api` : "/api";
 
         // Calculate pages needed similar to useSlider
         const itemsPerPage = 20;

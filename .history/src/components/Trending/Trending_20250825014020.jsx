@@ -4,10 +4,7 @@ import { TrendingSkeleton } from "../Skeleton";
 import { Link } from "react-router-dom";
 import { BsBookmarkStarFill } from "react-icons/bs";
 
-const PROXY_BASE =
-  API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http")
-    ? `${API_CONFIG.BASE_URL}/api/trending/all/`
-    : "/api/trending/all/";
+const PROXY_BASE = API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http") ? `${API_CONFIG.BASE_URL}/api/trending/all/` : "/api/trending/all/";
 
 const Trending = () => {
   const [timeWindow, setTimeWindow] = useState("day");
@@ -18,9 +15,7 @@ const Trending = () => {
     const fetchTrending = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `${PROXY_BASE}${timeWindow}?language=vi-VN`
-        );
+  const response = await fetch(`${PROXY_BASE}${timeWindow}?language=vi-VN`);
         const data = await response.json();
         setItems(data.results.slice(0, 10));
       } catch {

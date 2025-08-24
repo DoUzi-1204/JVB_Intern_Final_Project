@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_CONFIG } from "../utils/constants";
 
-const API_URL =
-  API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http")
-    ? `${API_CONFIG.BASE_URL}/api/person`
-    : "/api/person";
+const API_URL = API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http") ? `${API_CONFIG.BASE_URL}/api/person` : "/api/person";
 
 export default function useActor({ page = 1, personId = null } = {}) {
   // Danh sách diễn viên phổ biến

@@ -10,10 +10,7 @@ const useSlider = (endpoint, mediaType, limit = 15) => {
   // Determine base for API requests:
   // - If API_CONFIG.BASE_URL is a proxy (starts with http), we'll use `${BASE_URL}/api`.
   // - Otherwise (local dev) we call relative `/api` which Vite proxies to local Express.
-  const PROXY_BASE =
-    API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http")
-      ? `${API_CONFIG.BASE_URL}/api`
-      : "/api";
+  const PROXY_BASE = API_CONFIG.BASE_URL && API_CONFIG.BASE_URL.startsWith("http") ? `${API_CONFIG.BASE_URL}/api` : "/api";
 
   // Cache for preview data to avoid duplicate API calls
   const [previewCache, setPreviewCache] = useState(new Map());
