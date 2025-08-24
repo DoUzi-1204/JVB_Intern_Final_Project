@@ -1,0 +1,73 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import Image404 from "../404Image";
+import { API_CONFIG } from "../../utils/constants";
+
+const TopDayCard = ({ item, index = 0, mediaType = "movie" }) => {
+  const IMAGE_BASE = API_CONFIG.IMAGE_BASE_URL;
+
+  const posterUrl = item?.poster_path
+    ? `${IMAGE_BASE}/w342${item.poster_path}`
+    : null;
+
+  // Titles: fetcher (use item as provided by trending endpoint)
+  // The consumer of this component (TopDaySlider) will already fetch language variants
+  const titleVi = item?.vi_title || item?.title || item?.name || "";
+  const titleEn = item?.en_title || item?.original_title || item?.title || "";
+
+  const vote = item?.vote_average ? item.vote_average.toFixed(1) : "-";
+  const year = item?.release_date
+    ? new Date(item.release_date).getFullYear()
+    : item?.first_air_date
+    ? new Date(item.first_air_date).getFullYear()
+    : "-";
+
+  const isOdd = (index + 1) % 2 === 1;
+
+  return (
+    <div className="w-full max-w-[260px]">
+      <Link to={`/${mediaType}/${item.id}`} className="block">
+        <div
+          className={`relative rounded-md overflow-hidden transition-transform duration-200 hover:scale-105 bg-gray-800`}
+        >
+          {/* Poster area */}
+          <div
+            className={`w-full aspect-[2/3] bg-gray-900 flex items-center justify-center ${
+              isOdd ? "transform rotate-1" : "transform -rotate-1"
+            }`}
+          >
+            <Image404
+              src={posterUrl}
+              alt={titleVi || titleEn}
+              className={`w-full h-full object-cover`}
+              type="poster"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Bottom info */}
+          <div className="flex items-center justify-between px-3 py-3 bg-gray-900">
+            {/* Left: rank */}
+            <div className="flex-shrink-0">
+              <div className="text-4xl font-bold text-yellow-300 leading-none">{index + 1}</div>
+            </div>
+
+            {/* Right: stacked info */}
+            <div className="ml-3 flex-1 min-w-0 text-left">
+              <div className="text-white font-semibold text-sm line-clamp-1">
+                {titleVi}
+              </div>
+              <div className="text-gray-400 text-xs mt-1 line-clamp-1">{titleEn}</div>
+              <div className="flex items-center gap-3 mt-2">
+                <span className="text-yellow-300 text-sm">TMDB {vote}</span>
+                <span className="text-gray-400 text-xs">{year}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+};
+
+export default TopDayCard;

@@ -1,0 +1,124 @@
+import { useState, useEffect, useCallback } from "react";
+import { API_CONFIG } from "../utils/constants";
+
+const useBanner = () => {
+  const [movies, setMovies] = useState([]);
+  const [currentMovie, setCurrentMovie] = useState(null);
+  const [movieDetails, setMovieDetails] = useState({});
+  const [movieDetailsEn, setMovieDetailsEn] = useState({});
+  const [movieImages, setMovieImages] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const API_KEY = import.meta.env.VITE_API_KEY;
+  const BASE_URL = API_CONFIG.BASE_URL;
+  const IMAGE_BASE_URL = API_CONFIG.IMAGE_BASE_URL;
+
+  useEffect(() => {
+    const fetchPopularMovies = async () => {
+      if (!API_KEY) {
+        setError(
+          "API key not found. Please check your environment configuration."
+        );
+        setLoading(false);
+        return;
+      }
+      try {
+        const response = await fetch(
+          `${BASE_URL}/movie/popular?api_key=${API_KEY}&language=vi-VN&page=1`
+        );
+        const data = await response.json();
+        const popularMovies = data.results.slice(0, 6);
+        setMovies(popularMovies);
+        if (popularMovies.length > 0) {
+          setCurrentMovie(popularMovies[0]);
+        }
+      } catch {
+        setError("Failed to fetch movies. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPopularMovies();
+  }, [API_KEY, BASE_URL]);
+
+  const fetchMovieDetails = useCallback(
+    async (movieId) => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=vi-VN&append_to_response=release_dates`
+        );
+        const data = await response.json();
+        setMovieDetails((prev) => ({ ...prev, [movieId]: data }));
+      } catch {
+        // Silent error
+      }
+    },
+    [API_KEY, BASE_URL]
+  );
+
+  const fetchMovieDetailsEn = useCallback(
+    async (movieId) => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/movie/${movieId}?api_key=${API_KEY}&language=en-US`
+        );
+        const data = await response.json();
+        setMovieDetailsEn((prev) => ({ ...prev, [movieId]: data }));
+      } catch {
+        // Silent error
+      }
+    },
+    [API_KEY, BASE_URL]
+  );
+
+  const fetchMovieImages = useCallback(
+    async (movieId) => {
+      try {
+        const response = await fetch(
+          `${BASE_URL}/movie/${movieId}/images?api_key=${API_KEY}`
+        );
+        const data = await response.json();
+        setMovieImages((prev) => ({ ...prev, [movieId]: data }));
+      } catch {
+        // Silent error
+      }
+    },
+    [API_KEY, BASE_URL]
+  );
+
+  useEffect(() => {
+    if (currentMovie) {
+      if (!movieDetails[currentMovie.id]) {
+        fetchMovieDetails(currentMovie.id);
+      }
+      if (!movieDetailsEn[currentMovie.id]) {
+        fetchMovieDetailsEn(currentMovie.id);
+      }
+      if (!movieImages[currentMovie.id]) {
+        fetchMovieImages(currentMovie.id);
+      }
+    }
+  }, [
+    currentMovie,
+    fetchMovieDetails,
+    fetchMovieDetailsEn,
+    fetchMovieImages,
+  ]);
+
+  return {
+    movies,
+    currentMovie,
+    setCurrentMovie,
+    movieDetails,
+    movieDetailsEn,
+    movieImages,
+    loading,
+    error,
+    API_KEY,
+    BASE_URL,
+    IMAGE_BASE_URL,
+  };
+};
+
+export default useBanner;

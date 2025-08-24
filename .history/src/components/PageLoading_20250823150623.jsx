@@ -1,0 +1,17 @@
+import React from "react";
+
+const PageLoading = ({ message = "Đang tải..." }) => {
+  return (
+    <>
+      <div className="absolute inset-0 bg-gray-900 z-40" />
+      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+        <div className="text-center pointer-events-auto">
+          <div className="w-16 h-16 border-4 border-gray-600 border-t-yellow-400 rounded-full animate-spin mx-auto"></div>
+          {message && <p className="mt-3 text-white">{message}</p>}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default PageLoading;
